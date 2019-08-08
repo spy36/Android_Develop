@@ -1,0 +1,37 @@
+// 블루투스 사용 가능여부 확인
+		try {
+			if (!BeaconManager.getInstanceForApplication(this).checkAvailability()) {
+				// 블루투스 권환 비활성화 알림창 -> 켜주지는 않음
+				final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // 다이얼로그의 타이틀
+				builder.setTitle("Bluetooth not enabled");			
+        // 다이얼로그의 내용
+				builder.setMessage("Please enable bluetooth in settings and restart this application.");
+				builder.setPositiveButton(android.R.string.ok, null);
+				builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						//finish();
+			            //System.exit(0);
+					}					
+				});
+				builder.show();
+			}			
+		}
+		catch (RuntimeException e) {
+			final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Bluetooth LE not available");			
+			builder.setMessage("Sorry, this device does not support Bluetooth LE.");
+			builder.setPositiveButton(android.R.string.ok, null);
+			builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					//finish();
+		            //System.exit(0);
+				}
+				
+			});
+			builder.show();
+			
+		}
