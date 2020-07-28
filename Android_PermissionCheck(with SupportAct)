@@ -1,5 +1,7 @@
 ** Main java in code **
 
+    private PermissionSupport permission;
+
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
