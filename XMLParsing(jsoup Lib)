@@ -1,0 +1,83 @@
+** java in code **
+
+  LoginTask task = new LoginTask();
+        try{
+            String url = "https://mobile.hankook.or.kr/test/plogin_pro.jsp?id="+id+"&pw="+pw;
+            Log.d(TAG, "URL : " + url);
+            String result = task.execute(url).get();
+            Log.d(TAG, "RESULT : " + result);
+            String[] a = result.split(",");
+
+            for(int i = 0 ; i < a.length ; i++ ){
+                Log.d(TAG, " a : " + a[i]);
+            }
+
+        }catch(Exception e){
+            Log.d(TAG, "CheckId Ex : " + e);
+        }
+
+
+** java Async code **
+
+      protected class LoginTask extends AsyncTask<String, Void, String>{
+
+        String sendMsg, receiveMsg;
+        @Override
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                Document document = Jsoup.connect(strings[0]).get(); // Web에서 내용을 가져온다.
+                Elements elements = document.select("stat"); // 내용중에서 원하는 부분을 가져온다.
+                Elements elements2 = document.select("idno"); // 내용중에서 원하는 부분을 가져온다.
+                Elements elements3 = document.select("nanm"); // 내용중에서 원하는 부분을 가져온다.
+                Elements elements4 = document.select("auth"); // 내용중에서 원하는 부분을 가져온다.
+                Log.d(TAG, "DOCUMENT : " + document + " / elements : " + elements);
+                Element targetElement1 = elements.get(0);//1.현시간 2.온도 3.미세먼지
+                Element targetElement2 = elements2.get(0);//1.현시간 2.온도 3.미세먼지
+                Element targetElement3 = elements3.get(0);//1.현시간 2.온도 3.미세먼지
+                Element targetElement4 = elements4.get(0);//1.현시간 2.온도 3.미세먼지
+                String text1 = targetElement1.text();
+                String text2 = targetElement2.text();
+                String text3 = targetElement3.text();
+                String text4 = targetElement4.text();
+                Log.d(TAG, "te1 : " + text1 + " / te2 : " + text2 + " / te3 : " + text3 + " / te 4 : " + text4);
+
+                receiveMsg = text1 + "," + text2 + "," + text3 + "," + text4;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }catch (NullPointerException e){
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            return receiveMsg;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+            super.onPostExecute(s);
+        }
+    }
+
+
+** xml data example **
+ 
+  <data><list><STAT>Y</STAT><IDNO>IDNO</IDNO><NANM>NAME</NANM><AUTH>Y</AUTH></list></data>
+
+** xml data parsing result **
+
+  te1 : Y / te2 : IDNO / te3 : NAME / te 4 : Y
+  
+** build.gradle(Module.app) > dependencies add **
+
+  implementation 'org.jsoup:jsoup:1.11.3'
+  
