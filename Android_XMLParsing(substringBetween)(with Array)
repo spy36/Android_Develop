@@ -1,0 +1,141 @@
+** java in code **
+
+        String result = "";
+        Log.d(TAG, spno);
+        CustomTask task = new CustomTask();
+        try {
+            result = task.execute(hsno, spno).get();
+            Log.d(TAG, result);
+
+            String[] all_data = result.split("<list>");
+
+            ArrayList<String[]> data = new ArrayList<String[]>();
+
+            // 데이터 가공
+            for (int i = 1; i < all_data.length; i++) {
+
+                String word = all_data[i];
+                try {
+                    String[] tmp = new String[2];
+                    tmp[0] = substringBetween(word, "<PAID>", "</PAID>");
+                    tmp[1] = substringBetween(word, "<NANM>", "</NANM>");
+                    
+                    data.add(tmp);
+                } catch (Exception e) {
+                    Log.d(TAG, "ERR_data");
+                }
+            }
+
+            for (int i = 0; i < data.size(); i++) {
+                String[] a = data.get(i);
+
+                Log.d(TAG, "adf : " + i + "/" + a[0] + a[1]);
+
+                if (i == 0) {
+                    nametv.setText(a[1]);
+                    join_number_1 = a[0];
+                }
+                if (i == 1) {
+                    nametv2.setText(a[1]);
+                    join_number_2 = a[0];
+                }
+            }
+
+
+            Toast.makeText(PatiSelectActivity.this, "로딩 완료", Toast.LENGTH_SHORT).show();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "에러 발생.관리자에게 문의하세요. 에러코드 : M-NE1", Toast.LENGTH_SHORT).show();
+        }catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        
+        
+        
+        
+    private String substringBetween(String str, String open, String close) {
+        if (str == null || open == null || close == null) {
+            return null;
+        }
+        int start = str.indexOf(open);
+        if (start != -1) {
+            int end = str.indexOf(close, start + open.length());
+            if (end != -1) {
+                return str.substring(start + open.length(), end);
+            }
+        }
+        return null;
+    }
+
+        
+
+** Async java in code **
+
+      class CustomTask extends AsyncTask<String, Void, String> {
+
+        String sendMsg, receiveMsg;
+        @Override
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            try {
+                String str;
+                URL url = new URL(getString(R.string.patiSelUrl));
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestMethod("POST");
+                OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
+                sendMsg = "HSNO="+strings[0]+"&SPNO="+strings[1];
+                osw.write(sendMsg);
+                osw.flush();
+                Log.d(TAG, "wker : " + url+sendMsg);
+                if(conn.getResponseCode() == conn.HTTP_OK) {
+                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                    BufferedReader reader = new BufferedReader(tmp);
+                    StringBuffer buffer = new StringBuffer();
+                    while ((str = reader.readLine()) != null) {
+                        buffer.append(str);
+                    }
+                    receiveMsg = buffer.toString();
+                    Log.d(TAG, "wker : " + receiveMsg);
+                } else {
+                    Log.i("통신 결과", conn.getResponseCode()+"에러");
+                }
+
+                try {
+                    Thread.sleep(2000); // 2초 지속
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }catch (NullPointerException e){
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "에러 발생.관리자에게 문의하세요. 에러코드 : M-NE2", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return receiveMsg;
+        }
+
+        @Override
+
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+    }
+    
+    
+    
+    
