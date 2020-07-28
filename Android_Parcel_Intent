@@ -1,0 +1,73 @@
+** java in code send **
+
+      data=new ArrayList<PatiVO>();
+      
+      data.add(new PatiVO(String a, String b));
+      
+      Intent intent = new Intent(QRActivity.this, PatiSelectPopupActivity.class);
+      intent.putParcelableArrayListExtra("datas", data);
+      startActivityForResult(intent, 2);
+      
+** java in code receive **
+
+        ArrayList<PatiVO> data = new ArrayList<PatiVO>();
+        data = getIntent().getParcelableArrayListExtra("datas");
+        
+** PatiVo in code **
+
+        import android.os.Parcel;
+        import android.os.Parcelable;
+
+        public class PatiVO implements Parcelable  {
+
+            private String idno = "";
+            private String names = "";
+
+            public PatiVO(){}
+
+            public PatiVO(String idno, String names){
+                this.idno = idno;
+                this.names = names;
+            }
+
+            public String getIdno() {
+                return idno;
+            }
+
+            public String getNames() {
+                return names;
+            }
+
+            public PatiVO(Parcel in){
+                this.idno = in.readString();
+                this.names = in.readString();
+            }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+                dest.writeString(this.idno);
+                dest.writeString(this.names);
+            }
+
+            @SuppressWarnings("rawtypes")
+            public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+
+                @Override
+                public PatiVO createFromParcel(Parcel in) {
+                    return new PatiVO(in);
+                }
+
+                @Override
+                public PatiVO[] newArray(int size) {
+                    // TODO Auto-generated method stub
+                    return new PatiVO[size];
+                }
+
+            };
+
+        }
